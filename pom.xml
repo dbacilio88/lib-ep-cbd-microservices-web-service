@@ -22,16 +22,8 @@
         <java.version>11</java.version>
         <maven.test.skip>false</maven.test.skip>
         <project.test.result.directory>${project.build.directory}/test-results</project.test.result.directory>
-        <dependency-javax.servlet-version>2.5</dependency-javax.servlet-version>
-        <dependency-org.projectlombok-version>1.18.24</dependency-org.projectlombok-version>
-        <dependency-org.apache.commons-version>3.12.0</dependency-org.apache.commons-version>
-        <dependency-javax.json.bind-version>1.0</dependency-javax.json.bind-version>
-        <dependency-com.google.code.findbugs-version>3.0.1</dependency-com.google.code.findbugs-version>
-        <dependency-com.google.code.findbugs.jsr305-version>3.0.2</dependency-com.google.code.findbugs.jsr305-version>
-        <dependency-com.google.guava-version>31.1-jre</dependency-com.google.guava-version>
-        <dependency-org.apache.logging.log4j-version>2.19.0</dependency-org.apache.logging.log4j-version>
-        <dependency-org.apache.logging.log4j.core-version>2.19.0</dependency-org.apache.logging.log4j.core-version>
         <dependency-org.mock-server-version>5.14.0</dependency-org.mock-server-version>
+        <dependency-lib-ep-cbd-microservices-util-version>1.0.0</dependency-lib-ep-cbd-microservices-util-version>
         <plugin-maven-compiler.version>3.10.1</plugin-maven-compiler.version>
         <plugin-maven-dependency.version>2.8</plugin-maven-dependency.version>
         <plugin-maven-failsafe.version>2.22.2</plugin-maven-failsafe.version>
@@ -61,7 +53,7 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
+            <artifactId>spring-boot-starter-web-services</artifactId>
         </dependency>
 
         <dependency>
@@ -79,63 +71,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-<!--        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>${dependency-javax.servlet-version}</version>
-            <scope>provided</scope>
-        </dependency>-->
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${dependency-org.projectlombok-version}</version>
-        </dependency>
-
-        <!--<dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${dependency-org.apache.commons-version}</version>
-        </dependency>-->
-
-        <!--<dependency>
-            <groupId>javax.json.bind</groupId>
-            <artifactId>javax.json.bind-api</artifactId>
-            <version>${dependency-javax.json.bind-version}</version>
-        </dependency>-->
-
-        <!--<dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>annotations</artifactId>
-            <version>${dependency-com.google.code.findbugs-version}</version>
-            <scope>compile</scope>
-        </dependency>-->
-
-       <!-- <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <version>${dependency-com.google.code.findbugs.jsr305-version}</version>
-            <scope>compile</scope>
-        </dependency>-->
-
-        <!--<dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${dependency-com.google.guava-version}</version>
-        </dependency>-->
-
-      <!--  <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>${dependency-org.apache.logging.log4j-version}</version>
-        </dependency>-->
-
-        <!--<dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${dependency-org.apache.logging.log4j.core-version}</version>
-        </dependency>-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -164,14 +99,8 @@
 
         <dependency>
             <groupId>ep.mil.microservices</groupId>
-            <artifactId>lib-ep-cbd-microservices-utils-messaging-broker</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>ep.mil.microservices</groupId>
             <artifactId>lib-ep-cbd-microservices-utils</artifactId>
-            <version>1.0.0</version>
+            <version>${dependency-lib-ep-cbd-microservices-util-version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -359,22 +288,22 @@
 
     <distributionManagement>
         <repository>
-            <id>local-releases</id>
-            <name>local-release</name>
-            <url>file:///Users//cbacilio//Documents//novopayment//ambiente//cbd//archetypes//repository//releases</url>
+            <id>bacsystem-central</id>
+            <name>bacsystem-central</name>
+            <url>http://localhost:8081/repository/maven-releases/</url>
         </repository>
         <snapshotRepository>
-            <id>local-snapshots</id>
-            <name>local-snapshot</name>
-            <url>file:///Users//cbacilio//Documents//novopayment//ambiente//cbd//archetypes//repository//snapshots</url>
+            <id>bacsystem-central-snapshot</id>
+            <name>bacsystem-central-snapshot</name>
+            <url>http://localhost:8081/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
     <repositories>
         <repository>
-            <id>local-releases</id>
-            <name>local-release</name>
-            <url>file:///Users//cbacilio//Documents//novopayment//ambiente//cbd//archetypes//repository//releases</url>
+            <id>bacsystem-central</id>
+            <name>bacsystem-central</name>
+            <url>http://localhost:8081/repository/maven-public/</url>
         </repository>
     </repositories>
 

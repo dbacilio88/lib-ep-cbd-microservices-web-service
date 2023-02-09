@@ -32,7 +32,8 @@ public class SoapStandardProviderService extends SoapBaseService implements ISoa
     }
 
     @Override
-    public <T, R> Mono<SoapBusinessResponse<R>> doOnExecuteSoapService(SoapBusinessRequest<T, R> soapBusinessRequest, ISoapStandardDefinition soapStandardDefinition) {
+    public <T, R> Mono<SoapBusinessResponse<R>> doOnExecuteSoapService(
+        SoapBusinessRequest<T, R> soapBusinessRequest, ISoapStandardDefinition soapStandardDefinition) {
         log.debug("soapStandardProviderServiceId {}", this.getServiceIdentification());
         log.debug("{} call doOnExecuteSoapService method", this.getClass().getName());
         final SoapValidationResult soapBusinessRequestValidationResult = ISoapBusinessRequestValidation.validateSoapBusinessRequest()

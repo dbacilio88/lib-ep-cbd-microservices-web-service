@@ -19,7 +19,7 @@ public class SoapClientRequest<T> {
     private ICustomJsonDeserializer customJsonDeserializer;
     private SoapMutualConfiguration soapMutualConfiguration;
     private SoapConfiguration configuration;
-    private Class<T> classOfResponse;
+    private Class classOfResponse;
     private Type typeOfResponse;
     private T soapRequest;
 }

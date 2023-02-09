@@ -22,11 +22,11 @@ public class SoapSerializerService extends SoapBaseService implements ISoapSeria
 
     @Override
     public void loadCustomJsonDeserializer(ICustomJsonDeserializer customJsonDeserializer) {
+
         if (Objects.isNull(customJsonDeserializer)) {
             throw new SoapBusinessProcessException("ICustomJsonDeserializer not found");
         }
         gson = customJsonDeserializer.getCustomDeserializer();
-
     }
 
     @Override

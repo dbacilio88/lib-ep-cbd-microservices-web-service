@@ -24,7 +24,6 @@ import static pe.mil.microservices.utils.constants.CommonSoapConstants.SOAP_CLIE
 @Log4j2
 @Service
 public class SoapClientService extends SoapBaseService implements ISoapClientService {
-
     private final SoapServiceGatewayFactory soapServiceGatewayFactory;
 
     public SoapClientService(final SoapServiceGatewayFactory soapServiceGatewayFactory) {
@@ -33,25 +32,28 @@ public class SoapClientService extends SoapBaseService implements ISoapClientSer
     }
 
     @Override
-    public <T, R> Mono<SoapClientResponse<R>> doOnExecuteSoapMessage(SoapClientRequest<T> soapClientRequest) {
+    public <T, R> Mono<SoapClientResponse<R>> doOnExecuteSoapMessage(final SoapClientRequest<T> soapClientRequest) {
+
         log.debug("soapClientServiceId {}", this.getServiceIdentification());
         log.debug("{} call doOnExecuteSoapMessage method", this.getClass().getName());
         return doOnFactorySoapGatewayService(soapClientRequest)
-            .flatMap(soapGatewayService -> soapGatewayService.doOnExecuteMessage(soapClientRequest.getSoapRequest()))
-            .flatMap(response -> {
-                final ISoapSerializerService soapSerializerService = new SoapSerializerService();
-                if (Objects.nonNull(soapClientRequest.getCustomJsonDeserializer())) {
-                    soapSerializerService.loadCustomJsonDeserializer(soapClientRequest.getCustomJsonDeserializer());
-                }
+            .flatMap(soapGatewayService -> soapGatewayService.doOnExecuteMessage(soapClientRequest.getSoapRequest())
+                .flatMap(response -> {
 
-                final SoapClientResponse<R> soapClientResponse = new SoapClientResponse<>();
-                if (Objects.nonNull(soapClientRequest.getTypeOfResponse())) {
-                    soapClientResponse.setSoapResponse(soapSerializerService.fromObject(response, soapClientRequest.getTypeOfResponse()));
-                } else {
-                    soapClientResponse.setSoapResponse(soapSerializerService.fromObject(response, soapClientRequest.getClassOfResponse()));
-                }
-                return Mono.just(soapClientResponse);
-            })
+                    final ISoapSerializerService soapSerializerService = new SoapSerializerService();
+                    if (Objects.nonNull(soapClientRequest.getCustomJsonDeserializer())) {
+                        soapSerializerService.loadCustomJsonDeserializer(soapClientRequest.getCustomJsonDeserializer());
+                    }
+
+                    final SoapClientResponse<R> soapClientResponse = new SoapClientResponse<>();
+                    if (Objects.nonNull(soapClientRequest.getTypeOfResponse())) {
+                        soapClientResponse.setSoapResponse(soapSerializerService.fromObject(response, soapClientRequest.getTypeOfResponse()));
+                    } else {
+                        soapClientResponse.setSoapResponse(soapSerializerService.fromObject(response, soapClientRequest.getClassOfResponse()));
+                    }
+                    return Mono.just(soapClientResponse);
+                })
+            )
             .doOnSuccess(success -> {
                 log.debug("process doOnExecuteSoapMessage successfully completed");
                 log.debug("process doOnExecuteSoapMessage successfully completed, response: {}", success.toString());
@@ -61,8 +63,36 @@ public class SoapClientService extends SoapBaseService implements ISoapClientSer
             );
     }
 
+    private <T> Mono<SoapGatewayService> doOnFactorySoapGatewayService(final SoapClientRequest<T> soapClientRequest) {
+
+        log.debug("soapClientServiceId {}", this.getServiceIdentification());
+        log.debug("{} call doOnFactorySoapGatewayService method", this.getClass().getName());
+        return Mono.just(soapClientRequest)
+            .flatMap(currentSoapClientRequest -> {
+
+                if (Objects.isNull(currentSoapClientRequest.getSoapMutualConfiguration()) || Boolean.FALSE.equals(currentSoapClientRequest.getSoapMutualConfiguration().getMutualEnable())) {
+                    return soapServiceGatewayFactory.doOnFactory(soapClientRequest.getConfiguration());
+                }
+
+                final SoapValidationResult soapValidationResult = ISoapMutualConfigurationValidation.validateDefinitions().apply(currentSoapClientRequest.getSoapMutualConfiguration());
+                if (ValidateResult.NOT_VALID.equals(soapValidationResult.getValidateResult())) {
+                    return Mono.error(() -> new SoapBusinessProcessException("error in mutual tls configuration", ResponseCode.ERROR_DATA_INVALID));
+                }
+
+                return soapServiceGatewayFactory.doOnFactoryByMutual(currentSoapClientRequest.getConfiguration(), currentSoapClientRequest.getSoapMutualConfiguration());
+            })
+            .doOnSuccess(success -> {
+                log.debug("process doOnFactorySoapGatewayService successfully completed");
+                log.debug("process doOnFactorySoapGatewayService successfully completed, response: {}", success.toString());
+            })
+            .doOnError(throwable ->
+                log.error("exception error in process doOnFactorySoapGatewayService, error: {}", throwable.getMessage())
+            );
+    }
+
     @Override
     public <T, R> SoapClientResponse<R> executeSoapMessage(SoapClientRequest<T> soapClientRequest) {
+
         try {
 
             log.debug("soapClientServiceId {}", this.getServiceIdentification());
@@ -88,43 +118,20 @@ public class SoapClientService extends SoapBaseService implements ISoapClientSer
         }
     }
 
+
     private <T> SoapGatewayService factorySoapGatewayService(final SoapClientRequest<T> soapClientRequest) {
+
         log.debug("soapClientServiceId {}", this.getServiceIdentification());
         log.debug("{} call factorySoapGatewayService method", this.getClass().getName());
         if (Objects.isNull(soapClientRequest.getSoapMutualConfiguration()) || Boolean.FALSE.equals(soapClientRequest.getSoapMutualConfiguration().getMutualEnable())) {
             return soapServiceGatewayFactory.factory(soapClientRequest.getConfiguration());
         }
 
-        final SoapValidationResult validationResult = ISoapMutualConfigurationValidation.validateDefinitions()
-            .apply(soapClientRequest.getSoapMutualConfiguration());
-
-        if (ValidateResult.NOT_VALID.equals(validationResult.getValidateResult())) {
-            throw new SoapBusinessProcessException("error in mutual tls configuration, error: %s", ResponseCode.ERROR_IN_REQUESTED_DATA);
+        final SoapValidationResult soapValidationResult = ISoapMutualConfigurationValidation.validateDefinitions().apply(soapClientRequest.getSoapMutualConfiguration());
+        if (ValidateResult.NOT_VALID.equals(soapValidationResult.getValidateResult())) {
+            throw new SoapBusinessProcessException("error in mutual tls configuration, error: %s", ResponseCode.ERROR_DATA_INVALID);
         }
 
         return soapServiceGatewayFactory.factoryByMutual(soapClientRequest.getConfiguration(), soapClientRequest.getSoapMutualConfiguration());
-    }
-
-    private <T> Mono<SoapGatewayService> doOnFactorySoapGatewayService(final SoapClientRequest<T> soapClientRequest) {
-        log.debug("soapClientServiceId {}", this.getServiceIdentification());
-        log.debug("{} call doOnFactorySoapGatewayService method", this.getClass().getName());
-        return Mono.just(soapClientRequest)
-            .flatMap(current -> {
-
-                if (Objects.isNull(current.getSoapMutualConfiguration()) || Boolean.FALSE.equals(current.getSoapMutualConfiguration().getMutualEnable())) {
-                    return soapServiceGatewayFactory.doOnFactory(soapClientRequest.getConfiguration());
-                }
-                final SoapValidationResult soapValidationResult = ISoapMutualConfigurationValidation.validateDefinitions().apply(current.getSoapMutualConfiguration());
-                if (ValidateResult.NOT_VALID.equals(soapValidationResult.getValidateResult())) {
-                    return Mono.error(() -> new SoapBusinessProcessException("error in mutual tls configuration", ResponseCode.ERROR_DATA_INVALID));
-                }
-                return soapServiceGatewayFactory.doOnFactoryByMutual(current.getConfiguration(), current.getSoapMutualConfiguration());
-            }).doOnSuccess(success -> {
-                log.debug("process doOnFactorySoapGatewayService successfully completed");
-                log.debug("process doOnFactorySoapGatewayService successfully completed, response: {}", success.toString());
-            })
-            .doOnError(throwable ->
-                log.error("exception error in process doOnFactorySoapGatewayService, error: {}", throwable.getMessage())
-            );
     }
 }

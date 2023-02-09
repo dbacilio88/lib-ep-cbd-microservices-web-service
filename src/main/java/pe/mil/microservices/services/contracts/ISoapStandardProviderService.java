@@ -9,5 +9,4 @@ import reactor.core.publisher.Mono;
 public interface ISoapStandardProviderService {
 
     <T, R> Mono<SoapBusinessResponse<R>> doOnExecuteSoapService(SoapBusinessRequest<T, R> soapBusinessRequest, ISoapStandardDefinition soapStandardDefinition);
-
 }

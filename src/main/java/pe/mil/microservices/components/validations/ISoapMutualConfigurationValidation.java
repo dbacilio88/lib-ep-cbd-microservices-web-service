@@ -16,44 +16,43 @@ public interface ISoapMutualConfigurationValidation extends Function<SoapMutualC
     Logger log = LogManager.getLogger(ISoapMutualConfigurationValidation.class);
 
     static ISoapMutualConfigurationValidation validateDefinitions() {
-        return validation -> {
 
-            final SoapValidationResult validationResult = SoapValidationResult
-                .builder()
-                .validateResult(ValidateResult.SUCCESSFULLY_VALID)
-                .build();
+        return soapMutualConfiguration -> {
+
+            final SoapValidationResult soapValidationResult = SoapValidationResult.builder().validateResult(ValidateResult.SUCCESSFULLY_VALID).build();
             final List<String> errors = new ArrayList<>();
 
-            if (Objects.isNull(validation)) {
+            if (Objects.isNull(soapMutualConfiguration)) {
                 log.error("error in soapMutualConfiguration are not defined");
                 errors.add("error in soapMutualConfiguration are not defined");
             }
-            if (Objects.isNull(validation.getClientKeyStorePath())) {
+
+            if (Objects.isNull(soapMutualConfiguration.getClientKeyStorePath())) {
                 log.error("error in SoapMutualConfiguration the keyStorePath are not defined");
                 errors.add("error in SoapMutualConfiguration the keyStorePath are not defined");
             }
 
-            if (Objects.isNull(validation.getClientKeyStorePassword())) {
+            if (Objects.isNull(soapMutualConfiguration.getClientKeyStorePassword())) {
                 log.error("error in SoapMutualConfiguration the keyStorePassword are not defined");
                 errors.add("error in SoapMutualConfiguration the keyStorePassword are not defined");
             }
 
-            if (Objects.isNull(validation.getServerTrustStorePath())) {
+            if (Objects.isNull(soapMutualConfiguration.getServerTrustStorePath())) {
                 log.error("error in SoapMutualConfiguration the serverTrustStorePath are not defined");
                 errors.add("error in SoapMutualConfiguration the serverTrustStorePath are not defined");
             }
 
-            if (Objects.isNull(validation.getServerTrustStorePassword())) {
+            if (Objects.isNull(soapMutualConfiguration.getServerTrustStorePassword())) {
                 log.error("error in SoapMutualConfiguration the serverTrustStorePassword are not defined");
                 errors.add("error in SoapMutualConfiguration the serverTrustStorePassword are not defined");
             }
 
             if (!errors.isEmpty()) {
-                validationResult.setValidateResult(ValidateResult.NOT_VALID);
-                validationResult.setErrors(errors);
+                soapValidationResult.setValidateResult(ValidateResult.NOT_VALID);
+                soapValidationResult.setErrors(errors);
             }
 
-            return validationResult;
+            return soapValidationResult;
         };
     }
 }

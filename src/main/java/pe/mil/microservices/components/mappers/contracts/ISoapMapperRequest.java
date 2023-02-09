@@ -9,7 +9,9 @@ public interface ISoapMapperRequest<S, R> {
 
     List<R> mapRequestByList(List<S> source);
 
+
     Iterable<R> mapRequestByIterable(Iterable<S> source);
 
     ArrayList<R> mapRequestByArrayList(ArrayList<S> source);
+
 }

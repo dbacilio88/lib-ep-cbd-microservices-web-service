@@ -12,12 +12,12 @@ public abstract class SoapMapperResponse<S, R> implements ISoapMapperResponse<S,
         if (source == null) {
             return null;
         }
-        final List<R> result = new ArrayList<>(source.size());
+        final List<R> r = new ArrayList<>(source.size());
 
-        for (S sourceInstance : source) {
-            result.add(mapResponseBySource(sourceInstance));
+        for (S s : source) {
+            r.add(mapResponseBySource(s));
         }
-        return result;
+        return r;
     }
 
     @Override
@@ -25,12 +25,12 @@ public abstract class SoapMapperResponse<S, R> implements ISoapMapperResponse<S,
         if (source == null) {
             return null;
         }
-        final ArrayList<R> result = new ArrayList<>();
+        final ArrayList<R> r = new ArrayList<>();
 
-        for (S sourceInstance : source) {
-            result.add(mapResponseBySource(sourceInstance));
+        for (S s : source) {
+            r.add(mapResponseBySource(s));
         }
-        return result;
+        return r;
     }
 
     @Override
@@ -38,11 +38,11 @@ public abstract class SoapMapperResponse<S, R> implements ISoapMapperResponse<S,
         if (source == null) {
             return null;
         }
-        final ArrayList<R> result = new ArrayList<>(source.size());
+        final ArrayList<R> r = new ArrayList<>(source.size());
 
-        for (S sourceInstance : source) {
-            result.add(mapResponseBySource(sourceInstance));
+        for (S s : source) {
+            r.add(mapResponseBySource(s));
         }
-        return result;
+        return r;
     }
 }

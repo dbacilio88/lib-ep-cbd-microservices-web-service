@@ -7,19 +7,21 @@ import java.util.List;
 
 public abstract class SoapMapperRequest<S, R> implements ISoapMapperRequest<S, R> {
 
+
     @Override
     public List<R> mapRequestByList(List<S> source) {
 
         if (source == null) {
             return null;
         }
-        final List<R> result = new ArrayList<>(source.size());
 
-        for (S sourceInstance : source) {
-            result.add(mapRequestBySource(sourceInstance));
+        final List<R> m = new ArrayList<>(source.size());
+
+        for (S s : source) {
+            m.add(mapRequestBySource(s));
         }
 
-        return result;
+        return m;
     }
 
     @Override
@@ -29,13 +31,13 @@ public abstract class SoapMapperRequest<S, R> implements ISoapMapperRequest<S, R
             return null;
         }
 
-        final ArrayList<R> result = new ArrayList<>();
+        final ArrayList<R> m = new ArrayList<>();
 
-        for (S sourceInstance : source) {
-            result.add(mapRequestBySource(sourceInstance));
+        for (S s : source) {
+            m.add(mapRequestBySource(s));
         }
 
-        return result;
+        return m;
     }
 
     @Override
@@ -45,11 +47,12 @@ public abstract class SoapMapperRequest<S, R> implements ISoapMapperRequest<S, R
             return null;
         }
 
-        final ArrayList<R> result = new ArrayList<>();
+        final ArrayList<R> m = new ArrayList<>();
 
-        for (S sourceInstance : source) {
-            result.add(mapRequestBySource(sourceInstance));
+        for (S s : source) {
+            m.add(mapRequestBySource(s));
         }
-        return result;
+
+        return m;
     }
 }

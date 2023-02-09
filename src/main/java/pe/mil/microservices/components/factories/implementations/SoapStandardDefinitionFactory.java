@@ -19,7 +19,8 @@ public class SoapStandardDefinitionFactory implements ISoapStandardDefinitionFac
     }
 
     @Override
-    public ISoapStandardDefinition factory(String customDefinitionId) {
+    public ISoapStandardDefinition factory(final String customDefinitionId) {
+
         try {
             log.debug("customDefinitionId: {}", customDefinitionId);
             return beanFactory.getBean(customDefinitionId, ISoapStandardDefinition.class);

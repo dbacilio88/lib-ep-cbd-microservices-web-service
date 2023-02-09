@@ -4,5 +4,5 @@ import pe.mil.microservices.services.abstractions.contracts.ISoapStandardDefinit
 
 public interface ISoapStandardDefinitionFactory {
 
-    ISoapStandardDefinition factory(String customDefinitionId);
+    ISoapStandardDefinition factory(String standardDefinitionId);
 }

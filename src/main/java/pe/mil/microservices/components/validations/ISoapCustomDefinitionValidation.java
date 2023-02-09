@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import pe.mil.microservices.components.wsdl.SoapValidationResult;
 import pe.mil.microservices.services.abstractions.contracts.ISoapCustomDefinition;
 import pe.mil.microservices.utils.components.enums.ValidateResult;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,11 +19,7 @@ public interface ISoapCustomDefinitionValidation extends Function<ISoapCustomDef
     static ISoapCustomDefinitionValidation validateMutualConfiguration() {
 
         return soapProviderService -> {
-
-            final SoapValidationResult soapValidationResult = SoapValidationResult
-                .builder()
-                .validateResult(ValidateResult.SUCCESSFULLY_VALID)
-                .build();
+            final SoapValidationResult soapValidationResult = SoapValidationResult.builder().validateResult(ValidateResult.SUCCESSFULLY_VALID).build();
             final List<String> errors = new ArrayList<>();
 
             if (Objects.isNull(soapProviderService)) {

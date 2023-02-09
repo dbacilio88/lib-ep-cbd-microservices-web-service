@@ -110,7 +110,7 @@ public class SoapCustomProviderService extends SoapBaseService implements ISoapC
         log.debug("soapCustomProviderServiceId {}", this.getServiceIdentification());
         log.debug("SoapCustomProviderService call doOnExecuteSoapMessage method");
         return Mono.just(soapRequest)
-            .flatMap(currentSoapRequest -> Mono.just(soapCustomDefinition.buildNovoSoapClientRequest(currentSoapRequest))
+            .flatMap(currentSoapRequest -> Mono.just(soapCustomDefinition.buildSoapClientRequest(currentSoapRequest))
                 .flatMap(currentNovoSoapClientRequest -> soapClientService.doOnExecuteSoapMessage(currentNovoSoapClientRequest)
                     .flatMap(currentSoapResponse -> Mono.just(currentSoapResponse.getSoapResponse()))))
             .doOnSuccess(success ->

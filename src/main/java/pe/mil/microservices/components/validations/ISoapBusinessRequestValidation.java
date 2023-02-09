@@ -17,24 +17,24 @@ public interface ISoapBusinessRequestValidation extends Function<SoapBusinessReq
 
     static ISoapBusinessRequestValidation validateSoapBusinessRequest() {
 
-        return soapBusinessRequest -> {
+        return request -> {
             final SoapValidationResult soapValidationResult = SoapValidationResult
                 .builder()
                 .validateResult(ValidateResult.SUCCESSFULLY_VALID)
                 .build();
             final List<String> errors = new ArrayList<>();
 
-            if (Objects.isNull(soapBusinessRequest)) {
+            if (Objects.isNull(request)) {
                 log.error("error the soapBusinessRequest is null");
                 errors.add("error the soapBusinessRequest is null");
             }
 
-            if (Objects.isNull(soapBusinessRequest.getSoapBusinessRequest())) {
+            if (Objects.isNull(request.getSoapBusinessRequest())) {
                 log.error("error the businessRequest is null");
                 errors.add("error the businessRequest is null");
             }
 
-            if (Objects.isNull(soapBusinessRequest.getSoapDefinitionId())) {
+            if (Objects.isNull(request.getSoapDefinitionId())) {
                 log.error("error the soapProviderIdentification is null");
                 errors.add("error the soapProviderIdentification is null");
             }

@@ -30,19 +30,17 @@ import java.security.UnrecoverableKeyException;
 @Component
 public class SoapServiceGatewayFactory {
 
-    public Mono<SoapGatewayService> doOnFactory(final SoapConfiguration configuration) {
+    public Mono<SoapGatewayService> doOnFactory(final SoapConfiguration soapConfiguration) {
 
         return Mono.just(new SoapGatewayService())
-            .flatMap(soapGatewayService -> {
-
-                final Jaxb2Marshaller marshaller = SoapServiceHelper.buildJaxb2Marshaller(configuration.getServiceGeneratorWsdlPath());
-                soapGatewayService.setDefaultUri(configuration.getServiceUri());
-                soapGatewayService.setMarshaller(marshaller);
-                soapGatewayService.setUnmarshaller(marshaller);
-                return Mono.just(soapGatewayService);
-
-
-            }).doOnSuccess(success ->
+            .flatMap(currentSoapGatewayService -> {
+                final Jaxb2Marshaller jaxb2Marshaller = SoapServiceHelper.buildJaxb2Marshaller(soapConfiguration.getServiceGeneratorWsdlPath());
+                currentSoapGatewayService.setDefaultUri(soapConfiguration.getServiceUri());
+                currentSoapGatewayService.setMarshaller(jaxb2Marshaller);
+                currentSoapGatewayService.setUnmarshaller(jaxb2Marshaller);
+                return Mono.just(currentSoapGatewayService);
+            })
+            .doOnSuccess(success ->
                 log.debug("process factory SoapGatewayService successfully completed, response: {}", success.toString())
             )
             .doOnError(throwable ->
@@ -50,17 +48,16 @@ public class SoapServiceGatewayFactory {
             );
     }
 
-    public Mono<SoapGatewayService> doOnFactoryByMutual(final SoapConfiguration configuration, final SoapMutualConfiguration mutual) {
+    public Mono<SoapGatewayService> doOnFactoryByMutual(final SoapConfiguration soapConfiguration, final SoapMutualConfiguration soapMutualConfiguration) {
 
         return Mono.just(new SoapGatewayService())
-            .flatMap(soapGatewayService -> {
-                final Jaxb2Marshaller marshaller = SoapServiceHelper.buildJaxb2Marshaller(configuration.getServiceGeneratorWsdlPath());
-                soapGatewayService.setWebServiceTemplate(factoryWebServiceTemplate(mutual));
-                soapGatewayService.setDefaultUri(configuration.getServiceUri());
-                soapGatewayService.setMarshaller(marshaller);
-                soapGatewayService.setUnmarshaller(marshaller);
-                return Mono.just(soapGatewayService);
-
+            .flatMap(currentSoapGatewayService -> {
+                final Jaxb2Marshaller jaxb2Marshaller = SoapServiceHelper.buildJaxb2Marshaller(soapConfiguration.getServiceGeneratorWsdlPath());
+                currentSoapGatewayService.setWebServiceTemplate(factoryWebServiceTemplate(soapMutualConfiguration));
+                currentSoapGatewayService.setDefaultUri(soapConfiguration.getServiceUri());
+                currentSoapGatewayService.setMarshaller(jaxb2Marshaller);
+                currentSoapGatewayService.setUnmarshaller(jaxb2Marshaller);
+                return Mono.just(currentSoapGatewayService);
             })
             .doOnSuccess(success ->
                 log.debug("process factory SoapGatewayService by mutual tls successfully completed, response: {}", success.toString())
@@ -70,55 +67,54 @@ public class SoapServiceGatewayFactory {
             );
     }
 
-    public SoapGatewayService factoryByMutual(final SoapConfiguration configuration, final SoapMutualConfiguration mutual) {
+    public SoapGatewayService factoryByMutual(final SoapConfiguration soapConfiguration, final SoapMutualConfiguration soapMutualConfiguration) {
         final SoapGatewayService soapGatewayService = new SoapGatewayService();
-        final Jaxb2Marshaller jaxb2Marshaller = SoapServiceHelper.buildJaxb2Marshaller(configuration.getServiceGeneratorWsdlPath());
-        soapGatewayService.setWebServiceTemplate(factoryWebServiceTemplate(mutual));
-        soapGatewayService.setDefaultUri(configuration.getServiceUri());
+        final Jaxb2Marshaller jaxb2Marshaller = SoapServiceHelper.buildJaxb2Marshaller(soapConfiguration.getServiceGeneratorWsdlPath());
+        soapGatewayService.setWebServiceTemplate(factoryWebServiceTemplate(soapMutualConfiguration));
+        soapGatewayService.setDefaultUri(soapConfiguration.getServiceUri());
         soapGatewayService.setMarshaller(jaxb2Marshaller);
         soapGatewayService.setUnmarshaller(jaxb2Marshaller);
         return soapGatewayService;
     }
 
-    public SoapGatewayService factory(final SoapConfiguration configuration) {
+    public SoapGatewayService factory(final SoapConfiguration soapConfiguration) {
         final SoapGatewayService soapGatewayService = new SoapGatewayService();
-        final Jaxb2Marshaller jaxb2Marshaller = SoapServiceHelper.buildJaxb2Marshaller(configuration.getServiceGeneratorWsdlPath());
-        soapGatewayService.setDefaultUri(configuration.getServiceUri());
+        final Jaxb2Marshaller jaxb2Marshaller = SoapServiceHelper.buildJaxb2Marshaller(soapConfiguration.getServiceGeneratorWsdlPath());
+        soapGatewayService.setDefaultUri(soapConfiguration.getServiceUri());
         soapGatewayService.setMarshaller(jaxb2Marshaller);
         soapGatewayService.setUnmarshaller(jaxb2Marshaller);
         return soapGatewayService;
     }
 
-    private WebServiceTemplate factoryWebServiceTemplate(final SoapMutualConfiguration mutual) {
+    private WebServiceTemplate factoryWebServiceTemplate(final SoapMutualConfiguration soapMutualConfiguration) {
+
         try {
 
-            final SSLContext sslContext = SSLContextBuilder
-                .create()
+            final SSLContext sslContext = SSLContextBuilder.create()
                 .loadKeyMaterial(
-                    SoapKeyStoreHelper.createKeyStore(mutual.getClientKeyStorePath(), mutual.getClientKeyStorePassword()),
-                    mutual.getClientKeyStorePassword().toCharArray())
-                .loadTrustMaterial(
-                    SoapKeyStoreHelper.createKeyStore(mutual.getServerTrustStorePath(), mutual.getClientKeyStorePassword()),
-                    (TrustStrategy) (chain, authType) -> false
+                    SoapKeyStoreHelper.createKeyStore(soapMutualConfiguration.getClientKeyStorePath(), soapMutualConfiguration.getClientKeyStorePassword()),
+                    soapMutualConfiguration.getClientKeyStorePassword().toCharArray()
                 )
-                .build();
+                .loadTrustMaterial(
+                    SoapKeyStoreHelper.createKeyStore(soapMutualConfiguration.getServerTrustStorePath(), soapMutualConfiguration.getClientKeyStorePassword()),
+                    (TrustStrategy) (chain, authType) -> false
+                ).build();
 
             final SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
 
 
-            final HttpClient client = HttpClientBuilder
-                .create()
+            final HttpClient httpClient = HttpClientBuilder.create()
                 .setSSLSocketFactory(sslConnectionSocketFactory)
                 .addInterceptorFirst(new HttpComponentsMessageSender.RemoveSoapHeadersInterceptor())
                 .build();
 
+
             final HttpComponentsMessageSender httpComponentsMessageSender = new HttpComponentsMessageSender();
-            httpComponentsMessageSender.setHttpClient(client);
+            httpComponentsMessageSender.setHttpClient(httpClient);
 
             final WebServiceTemplate webServiceTemplate = new WebServiceTemplate();
             webServiceTemplate.setMessageSender(httpComponentsMessageSender);
             return webServiceTemplate;
-
         } catch (NoSuchAlgorithmException e) {
             log.error("error in process create sslContext, NoSuchAlgorithmException, error: {}", e.getMessage());
             throw new SoapBusinessProcessException(e.getMessage(), ResponseCode.INTERNAL_SERVER_ERROR);
@@ -132,6 +128,5 @@ public class SoapServiceGatewayFactory {
             log.error("error in process create sslContext, KeyManagementException, error: {}", e.getMessage());
             throw new SoapBusinessProcessException(e.getMessage(), ResponseCode.INTERNAL_SERVER_ERROR);
         }
-
     }
 }

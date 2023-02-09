@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import pe.mil.microservices.components.wsdl.SoapValidationResult;
 import pe.mil.microservices.services.abstractions.contracts.ISoapStandardDefinition;
 import pe.mil.microservices.utils.components.enums.ValidateResult;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,10 +20,8 @@ public interface ISoapStandardDefinitionValidation extends Function<ISoapStandar
     static ISoapStandardDefinitionValidation validateDefinitions() {
 
         return soapStandardDefinition -> {
-            final SoapValidationResult soapValidationResult = SoapValidationResult
-                .builder()
-                .validateResult(ValidateResult.SUCCESSFULLY_VALID)
-                .build();
+
+            final SoapValidationResult soapValidationResult = SoapValidationResult.builder().validateResult(ValidateResult.SUCCESSFULLY_VALID).build();
             final List<String> errors = new ArrayList<>();
 
             if (Objects.isNull(soapStandardDefinition)) {
@@ -52,10 +51,8 @@ public interface ISoapStandardDefinitionValidation extends Function<ISoapStandar
     static ISoapStandardDefinitionValidation customValidation(final Predicate<ISoapStandardDefinition> validation) {
 
         return soapStandardDefinition -> {
-            final SoapValidationResult soapValidationResult = SoapValidationResult
-                .builder()
-                .validateResult(ValidateResult.SUCCESSFULLY_VALID)
-                .build();
+
+            final SoapValidationResult soapValidationResult = SoapValidationResult.builder().validateResult(ValidateResult.SUCCESSFULLY_VALID).build();
             final List<String> errors = new ArrayList<>();
 
             if (Boolean.FALSE.equals(validation.test(soapStandardDefinition))) {
@@ -76,11 +73,7 @@ public interface ISoapStandardDefinitionValidation extends Function<ISoapStandar
 
         return soapStandardDefinition -> {
             final SoapValidationResult soapValidationResult = this.apply(soapStandardDefinition);
-            return ValidateResult
-                .SUCCESSFULLY_VALID
-                .equals(soapValidationResult.getValidateResult())
-                ? otherValidation.apply(soapStandardDefinition)
-                : soapValidationResult;
+            return ValidateResult.SUCCESSFULLY_VALID.equals(soapValidationResult.getValidateResult()) ? otherValidation.apply(soapStandardDefinition) : soapValidationResult;
         };
     }
 }

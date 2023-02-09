@@ -18,9 +18,9 @@ public class SoapKeyStoreHelper {
 
     public static KeyStore createKeyStore(final String keyStorePath, final String keyStorePassword) {
 
-        try (InputStream inputStream = new FileInputStream(ResourceUtils.getFile(keyStorePath))) {
+        try (InputStream inputStreamTrustStore = new FileInputStream(ResourceUtils.getFile(keyStorePath))) {
             final KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(inputStream, keyStorePassword.toCharArray());
+            keyStore.load(inputStreamTrustStore, keyStorePassword.toCharArray());
             return keyStore;
         } catch (KeyStoreException e) {
             log.error("error in process createKeyStore, KeyStoreException, error: {}", e.getMessage());

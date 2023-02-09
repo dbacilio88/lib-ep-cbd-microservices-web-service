@@ -17,5 +17,5 @@ public interface ISoapCustomDefinition {
 
     <SR> ISoapValidationResponse<SR> validateSoapResponse();
 
-    <ST> SoapClientRequest<ST> buildNovoSoapClientRequest(ST soapRequest);
+    <ST> SoapClientRequest<ST> buildSoapClientRequest(ST soapRequest);
 }

@@ -14,5 +14,6 @@ import java.io.Serializable;
 public class SoapConfiguration implements Serializable {
     private static final long serialVersionUID = -1287345277521213499L;
     private String serviceUri;
+    private String serviceAction;
     private String serviceGeneratorWsdlPath;
 }

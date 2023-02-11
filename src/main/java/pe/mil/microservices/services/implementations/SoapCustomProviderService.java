@@ -34,20 +34,25 @@ public class SoapCustomProviderService extends SoapBaseService implements ISoapC
     }
 
     @Override
-    public <T, R> Mono<SoapBusinessResponse<R>> doOnExecuteSoapService(SoapBusinessRequest<T, R> soapBusinessRequest, ISoapCustomDefinition soapCustomDefinition) {
+    public <T, R> Mono<SoapBusinessResponse<R>> doOnExecuteSoapService(
+        SoapBusinessRequest<T, R> soapBusinessRequest, ISoapCustomDefinition soapCustomDefinition) {
         log.debug("soapCustomProviderServiceId {}", this.getServiceIdentification());
         log.debug("{} call doOnExecuteSoapService method", this.getClass().getName());
-        final SoapValidationResult soapBusinessRequestValidationResult = ISoapBusinessRequestValidation.validateSoapBusinessRequest()
+        final SoapValidationResult soapBusinessRequestValidationResult = ISoapBusinessRequestValidation
+            .validateSoapBusinessRequest()
             .apply(soapBusinessRequest);
 
         if (ValidateResult.NOT_VALID.equals(soapBusinessRequestValidationResult.getValidateResult())) {
-            return Mono.error(() -> new SoapBusinessProcessException("error in soap business request validation", ResponseCode.ERROR_DATA_INVALID));
+            return Mono.error(() -> new SoapBusinessProcessException("error in soap business request validation",
+                ResponseCode.ERROR_DATA_INVALID));
         }
 
-        final SoapValidationResult soapDefinitionValidationResult = ISoapCustomDefinitionValidation.validateMutualConfiguration().apply(soapCustomDefinition);
+        final SoapValidationResult soapDefinitionValidationResult = ISoapCustomDefinitionValidation
+            .validateMutualConfiguration().apply(soapCustomDefinition);
 
         if (ValidateResult.NOT_VALID.equals(soapDefinitionValidationResult.getValidateResult())) {
-            return Mono.error(() -> new SoapBusinessProcessException("error in soap business request validation", ResponseCode.ERROR_DATA_INVALID));
+            return Mono.error(() -> new SoapBusinessProcessException("error in soap business request validation",
+                ResponseCode.ERROR_DATA_INVALID));
         }
 
         return doOnMapSoapRequest(soapBusinessRequest, soapCustomDefinition)
@@ -63,7 +68,9 @@ public class SoapCustomProviderService extends SoapBaseService implements ISoapC
             ).log();
     }
 
-    private <T, R> Mono<?> doOnMapSoapRequest(final SoapBusinessRequest<T, R> soapBusinessRequest, final ISoapCustomDefinition soapCustomDefinition) {
+    private <T, R> Mono<?> doOnMapSoapRequest(
+        final SoapBusinessRequest<T, R> soapBusinessRequest,
+        final ISoapCustomDefinition soapCustomDefinition) {
 
         log.debug("soapCustomProviderServiceId {}", this.getServiceIdentification());
         log.debug("SoapCustomProviderService call doOnMapSoapRequest method");
@@ -89,12 +96,16 @@ public class SoapCustomProviderService extends SoapBaseService implements ISoapC
                 log.debug("find soap request validator");
                 return Mono.just(soapCustomDefinition.validateSoapRequest())
                     .flatMap(currentSoapValidationRequest -> {
-                        // apply the current soap request validation
-                        final SoapValidationResult soapValidationResult = currentSoapValidationRequest.validateRequest(currentSoapRequest);
-                        if (Objects.nonNull(soapValidationResult) && ValidateResult.SUCCESSFULLY_VALID.equals(soapValidationResult.getValidateResult())) {
+                        final SoapValidationResult soapValidationResult = currentSoapValidationRequest
+                            .validateRequest(currentSoapRequest);
+
+
+                        if (Objects.nonNull(soapValidationResult)
+                            && ValidateResult.SUCCESSFULLY_VALID.equals(soapValidationResult.getValidateResult())) {
                             return Mono.just(currentSoapRequest);
                         }
-                        return Mono.error(() -> new SoapBusinessProcessException("error in soap request validation", ResponseCode.ERROR_DATA_INVALID));
+                        return Mono.error(() -> new SoapBusinessProcessException("error in soap request validation",
+                            ResponseCode.ERROR_DATA_INVALID));
                     });
             })
             .doOnSuccess(success ->
@@ -111,7 +122,8 @@ public class SoapCustomProviderService extends SoapBaseService implements ISoapC
         log.debug("SoapCustomProviderService call doOnExecuteSoapMessage method");
         return Mono.just(soapRequest)
             .flatMap(currentSoapRequest -> Mono.just(soapCustomDefinition.buildSoapClientRequest(currentSoapRequest))
-                .flatMap(currentNovoSoapClientRequest -> soapClientService.doOnExecuteSoapMessage(currentNovoSoapClientRequest)
+                .flatMap(currentNovoSoapClientRequest -> soapClientService
+                    .doOnExecuteSoapMessage(currentNovoSoapClientRequest)
                     .flatMap(currentSoapResponse -> Mono.just(currentSoapResponse.getSoapResponse()))))
             .doOnSuccess(success ->
                 log.debug("process doOnExecuteSoapMessage successfully completed, response: {}", success.toString())
@@ -136,13 +148,16 @@ public class SoapCustomProviderService extends SoapBaseService implements ISoapC
             );
     }
 
-    private <T, R> Mono<SoapBusinessResponse<R>> doOnReturnSoapBusinessResponse(final R businessResponse, final SoapBusinessRequest<T, R> soapBusinessRequest) {
+    private <T, R> Mono<SoapBusinessResponse<R>> doOnReturnSoapBusinessResponse(
+        final R businessResponse, final SoapBusinessRequest<T, R> soapBusinessRequest) {
 
         log.debug("soapCustomProviderServiceId {}", this.getServiceIdentification());
         log.debug("SoapCustomProviderService call doOnReturnSoapBusinessResponse method");
         return Mono.just(businessResponse)
             .flatMap(currentBusinessResponse -> {
+
                 final SoapBusinessResponse<R> soapBusinessResponse = createDoOnReturnSoapBusinessResponse(businessResponse, soapBusinessRequest);
+
                 return Mono.just(soapBusinessResponse);
             })
             .doOnSuccess(success ->

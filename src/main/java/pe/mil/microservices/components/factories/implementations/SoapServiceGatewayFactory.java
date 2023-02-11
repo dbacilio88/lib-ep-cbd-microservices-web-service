@@ -48,7 +48,9 @@ public class SoapServiceGatewayFactory {
             );
     }
 
-    public Mono<SoapGatewayService> doOnFactoryByMutual(final SoapConfiguration soapConfiguration, final SoapMutualConfiguration soapMutualConfiguration) {
+    public Mono<SoapGatewayService> doOnFactoryByMutual(
+        final SoapConfiguration soapConfiguration,
+        final SoapMutualConfiguration soapMutualConfiguration) {
 
         return Mono.just(new SoapGatewayService())
             .flatMap(currentSoapGatewayService -> {

@@ -94,7 +94,8 @@ public class SoapStandardProviderService extends SoapBaseService implements ISoa
         log.debug("{} call doOnExecuteSoapMessage method", this.getClass().getName());
         return Mono.just(soapRequest)
             .flatMap(currentSoapRequest -> Mono.just(soapStandardDefinition.buildSoapClientRequest(currentSoapRequest))
-                .flatMap(currentNovoSoapClientRequest -> soapClientService.doOnExecuteSoapMessage(currentNovoSoapClientRequest)
+                .flatMap(currentNovoSoapClientRequest ->
+                    soapClientService.doOnExecuteSoapMessage(currentNovoSoapClientRequest)
                     .flatMap(currentSoapResponse -> Mono.just(currentSoapResponse.getSoapResponse()))))
             .doOnSuccess(success ->
                 log.debug("process doOnValidateSoapRequest successfully completed, response: {}", success.toString())

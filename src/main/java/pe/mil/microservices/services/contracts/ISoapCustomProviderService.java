@@ -6,6 +6,6 @@ import pe.mil.microservices.services.abstractions.contracts.ISoapCustomDefinitio
 import reactor.core.publisher.Mono;
 
 public interface ISoapCustomProviderService {
-
-    <T, R> Mono<SoapBusinessResponse<R>> doOnExecuteSoapService(SoapBusinessRequest<T, R> soapBusinessRequest, ISoapCustomDefinition soapCustomDefinition);
+    <T, R> Mono<SoapBusinessResponse<R>> doOnExecuteSoapService(
+        SoapBusinessRequest<T, R> soapBusinessRequest, ISoapCustomDefinition soapCustomDefinition);
 }

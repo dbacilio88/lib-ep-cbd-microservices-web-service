@@ -51,8 +51,11 @@ public abstract class SoapBaseService {
                 if (Boolean.TRUE.equals(isStandard)) {
                     return Mono.just(soapStandardDefinition.validateSoapResponse())
                         .flatMap(standardSoapValidationResponse -> {
+
                             final SoapValidationResult soapValidationResult = standardSoapValidationResponse.validateResponse(response);
+
                             if (Objects.nonNull(soapValidationResult) && ValidateResult.SUCCESSFULLY_VALID.equals(soapValidationResult.getValidateResult())) {
+
                                 return Mono.just(response);
                             }
                             return Mono.error(() -> new SoapBusinessProcessException("error in soap response validation", ResponseCode.ERROR_DATA_INVALID));
@@ -62,6 +65,7 @@ public abstract class SoapBaseService {
                         .flatMap(currentSoapValidationResponse -> {
 
                             final SoapValidationResult soapValidationResult = currentSoapValidationResponse.validateResponse(response);
+
                             if (Objects.nonNull(soapValidationResult) && ValidateResult.SUCCESSFULLY_VALID.equals(soapValidationResult.getValidateResult())) {
                                 return Mono.just(response);
                             }
